@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/AI_RockPaperScissors/main.unity
+  isLoaded: 1
+  isActive: 1
