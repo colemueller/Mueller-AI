@@ -11,9 +11,9 @@ public class gamemanager_v2 : MonoBehaviour {
     public Type AIChoice;
     public Type LastChoice = Type.NULL;
 
-    public float rockProb = 0.35f;
-    public float paperProb = 0.35f;
-    public float scissorProb = 0.3f;
+    public float rockProb = 35f;
+    public float paperProb = 35f;
+    public float scissorProb = 30f;
 
     public static int trialNum = 0;
     public int timeValue = 10;
@@ -39,6 +39,7 @@ public class gamemanager_v2 : MonoBehaviour {
     public Text rockProbText;
     public Text paperProbText;
     public Text scissorsProbText;
+    public Text randomText;
 
     
 
@@ -54,9 +55,9 @@ public class gamemanager_v2 : MonoBehaviour {
         trialText.text = "Trial #" + trialNum.ToString();
         timerText.text = timeValue.ToString();
 
-        rockProbText.text = "Rock: " + (rockProb * 100).ToString() + "%";
-        paperProbText.text = "Paper: " + (paperProb * 100).ToString() + "%";
-        scissorsProbText.text = "Scissors: " + (scissorProb * 100).ToString() + "%";
+        rockProbText.text = "Rock: " + rockProb.ToString() + "%";
+        paperProbText.text = "Paper: " + paperProb.ToString() + "%";
+        scissorsProbText.text = "Scissors: " + scissorProb.ToString() + "%";
 
         if (timeValue <= 0)
         {
@@ -87,6 +88,7 @@ public class gamemanager_v2 : MonoBehaviour {
 
     public void MakeAIChoice()
     {
+        /*
         //====================================================================================================================
         //EVALUATION -- Psuedo-Bayesian
         //====================================================================================================================
@@ -226,7 +228,30 @@ public class gamemanager_v2 : MonoBehaviour {
         //====================================================================================================================
         //EVALUATION -- LINEAR -- END
         //====================================================================================================================
+        */
 
+        //====================================================================================================================
+        //EVALUATION -- TRUE PROBABILITY -- START
+        //====================================================================================================================
+        
+        int num = Random.Range(0,100);
+        randomText.text = "Num: " + num.ToString();
+
+        //Random num falls within rock probability
+        if(0f <= num && num <= rockProb)
+        {
+            AIChoice = Type.PAPER;
+        }
+        //Random num falls within paper probability
+        else if (rockProb < num && num <= (rockProb + paperProb))
+        {
+            AIChoice = Type.SCISSORS;
+        }
+        //Random num falls within scissors probability
+        else
+        {
+            AIChoice = Type.ROCK;
+        }
 
 
         //change text of AI choice
@@ -249,31 +274,31 @@ public class gamemanager_v2 : MonoBehaviour {
         switch (playerChoice)
         {
             case Type.ROCK:
-                if (rockProb < 1)
+                if (rockProb < 100)
                 {
-                    rockProb += 0.1f;
-                    paperProb -= 0.05f;
-                    scissorProb -= 0.05f;
+                    rockProb += 10f;
+                    paperProb -= 5f;
+                    scissorProb -= 5f;
                     
                 }
                 break;
 
             case Type.PAPER:
-                if (paperProb < 1)
+                if (paperProb < 100)
                 {
-                    paperProb += 0.1f;
-                    rockProb -= 0.05f;
-                    scissorProb -= 0.05f;
+                    paperProb += 10f;
+                    rockProb -= 5f;
+                    scissorProb -= 5f;
 
                 }
                 break;
 
             case Type.SCISSORS:
-                if (scissorProb < 1)
+                if (scissorProb < 100)
                 {
-                    scissorProb += 0.1f;
-                    paperProb -= 0.05f;
-                    rockProb -= 0.05f;
+                    scissorProb += 10f;
+                    paperProb -= 5f;
+                    rockProb -= 5f;
 
                 }
                 break;
