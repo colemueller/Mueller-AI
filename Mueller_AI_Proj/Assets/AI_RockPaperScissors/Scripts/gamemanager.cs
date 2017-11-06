@@ -25,9 +25,12 @@ public class gamemanager : MonoBehaviour {
     public Text AISelectionText;
     public GameObject TieText;
     public GameObject StartButton;
+    public GameObject DoneButton;
 
     private int PlayerWins = 0;
     private int AIWins = 0;
+
+    
 
     public void OnStartClick()
     {
@@ -38,6 +41,13 @@ public class gamemanager : MonoBehaviour {
         StartCoroutine(CountDown());
         AISelectionText.text = "";
         StartButton.SetActive(false);
+        DoneButton.SetActive(true);
+    }
+
+    public void OnDoneClick()
+    {
+        StopAllCoroutines();
+        timeValue = 0;
     }
 
     IEnumerator CountDown()
@@ -58,6 +68,7 @@ public class gamemanager : MonoBehaviour {
             StopAllCoroutines();
             MakeAIChoice();
             StartButton.SetActive(true);
+            DoneButton.SetActive(false);
         }
 
         switch (playerChoice)
