@@ -6,18 +6,23 @@ using UnityEngine.UI;
 public class gamemanager_v2 : MonoBehaviour {
 
 
-    public enum Type { ROCK, PAPER, SCISSORS, NULL};
+    public enum Type { ROCK, PAPER, SCISSORS};
     public Type playerChoice;
     public Type AIChoice;
-    public Type LastChoice = Type.NULL;
+    public Type PlayerTell;
+    public Type AITell;
 
-    public float rockProb = 35f;
-    public float paperProb = 35f;
-    public float scissorProb = 30f;
+    [Range(0,100)]
+    public int rockProb = 35;
+    [Range(0, 100)]
+    public int paperProb = 35;
+    [Range(0, 100)]
+    public int scissorProb = 30;
 
     public static int trialNum = 0;
     public int timeValue = 10;
     public GameObject btnGroup;
+    public GameObject TellBtnGroup;
     public Text timerText;
     public Text trialText;
     public Text PlayerWinText;
@@ -25,6 +30,7 @@ public class gamemanager_v2 : MonoBehaviour {
     public Text AIWinText;
     public Text AIWinMessage;
     public Text PlayerSelectionText;
+    public Text PlayerTellText;
     public Text AISelectionText;
     public GameObject TieText;
     public GameObject StartButton;
@@ -63,10 +69,13 @@ public class gamemanager_v2 : MonoBehaviour {
         {
             timeValue = 10;
             btnGroup.SetActive(false);
+            TellBtnGroup.SetActive(false);
             StopAllCoroutines();
             MakeAIChoice();
             StartButton.SetActive(true);
             DoneButton.SetActive(false);
+
+            
         }
 
         switch (playerChoice)
@@ -84,157 +93,78 @@ public class gamemanager_v2 : MonoBehaviour {
                 break;
         }
 
+        switch (PlayerTell)
+        {
+            case Type.ROCK:
+                PlayerTellText.text = "ROCK";
+                break;
+
+            case Type.PAPER:
+                PlayerTellText.text = "PAPER";
+                break;
+
+            case Type.SCISSORS:
+                PlayerTellText.text = "SCISSORS";
+                break;
+        }
+
     }
 
     public void MakeAIChoice()
     {
-        /*
-        //====================================================================================================================
-        //EVALUATION -- Psuedo-Bayesian
-        //====================================================================================================================
 
-
-        //~~~~~~~~~~~~~~ ONE CHOICE ~~~~~~~~~~~~~~~
-        //rock most frequent
-        if(rockProb > paperProb && rockProb > scissorProb)
+        switch (PlayerTell)
         {
-            AIChoice = Type.PAPER;
-        }
-
-        //paper most frequent
-        else if (paperProb > rockProb && paperProb > scissorProb)
-        {
-            AIChoice = Type.SCISSORS;
-        }
-
-        //scissor most frequent
-        else if (scissorProb > paperProb && scissorProb > rockProb)
-        {
-            AIChoice = Type.ROCK;
-        }
-
-        //~~~~~~~~~~~~~~ ONE CHOICE END ~~~~~~~~~~~~~~~
-
-
-        //NEW: now has a potential tie-breaker with LastChoice evaluation
-        //rock and paper are same
-        else if (rockProb == paperProb && rockProb > scissorProb)
-        {
-            
-            if (LastChoice == Type.ROCK)  //players last choice was rock. AI assumes next choice will be also be rock
-            {
-                AIChoice = Type.PAPER;
-            }
-            else if (LastChoice == Type.PAPER)  //players last choice was paper. AI assumes next choice will be also be paper
-            {
-                AIChoice = Type.SCISSORS;
-            }
-            else //choose random
-            {
-                int temp = Random.Range(1, 2);
-                if (temp == 1)
+            case Type.ROCK:
+                if(paperProb >= 15)
                 {
-                    AIChoice = Type.PAPER;
+                    scissorProb += 10;
+                    rockProb += 5;
+                    paperProb -= 15;
                 }
                 else
                 {
-                    AIChoice = Type.SCISSORS;
+                    scissorProb += paperProb / 2;
+                    rockProb += paperProb / 2;
+                    paperProb = 0;
                 }
-            }
-        }
-
-        //rock and scissors are same
-        else if (rockProb == scissorProb && rockProb > paperProb)
-        {
-            if(LastChoice == Type.ROCK)
-            {
-                AIChoice = Type.PAPER;
-            }
-            else if (LastChoice == Type.SCISSORS)
-            {
-                AIChoice = Type.ROCK;
-            }
-            else { 
-                int temp = Random.Range(1, 2);
-                if (temp == 1)
+                break;
+            case Type.PAPER:
+                if (scissorProb >= 15)
                 {
-                    AIChoice = Type.PAPER;
+                    rockProb += 10;
+                    paperProb += 5;
+                    scissorProb -= 15;
                 }
                 else
                 {
-                    AIChoice = Type.ROCK;
+                    rockProb += scissorProb / 2;
+                    paperProb += scissorProb / 2;
+                    scissorProb = 0;
                 }
-            }
-        }
-
-        //paper and scissors are same
-        else if (paperProb == scissorProb && paperProb > rockProb)
-        {
-            if(LastChoice == Type.PAPER)
-            {
-                AIChoice = Type.SCISSORS;
-            }
-            else if (LastChoice == Type.SCISSORS)
-            {
-                AIChoice = Type.ROCK;
-            }
-            else { 
-                int temp = Random.Range(1, 2);
-                if (temp == 1)
+                break;
+            case Type.SCISSORS:
+                if (rockProb >= 15)
                 {
-                    AIChoice = Type.SCISSORS;
+                    paperProb += 10;
+                    scissorProb += 5;
+                    rockProb -= 15;
                 }
                 else
                 {
-                    AIChoice = Type.ROCK;
+                    paperProb += rockProb / 2;
+                    scissorProb += rockProb / 2;
+                    rockProb = 0;
                 }
-            }
+                break;
         }
-
-
-
-        //everything is same frequency
-        else
-        {
-            if (LastChoice == Type.ROCK)
-            {
-                AIChoice = Type.PAPER;
-            }
-            else if (LastChoice == Type.PAPER)
-            {
-                AIChoice = Type.SCISSORS;
-            }
-            else if(LastChoice == Type.SCISSORS)
-            {
-                AIChoice = Type.ROCK;
-            }
-            else { 
-                int temp = Random.Range(1, 3);
-                if (temp == 1)
-                {
-                    AIChoice = Type.SCISSORS;
-                }
-                else if (temp == 2)
-                {
-                    AIChoice = Type.ROCK;
-                }
-                else
-                {
-                    AIChoice = Type.PAPER;
-                }
-            }
-        }
-
-        //====================================================================================================================
-        //EVALUATION -- LINEAR -- END
-        //====================================================================================================================
-        */
+        
 
         //====================================================================================================================
         //EVALUATION -- TRUE PROBABILITY -- START
         //====================================================================================================================
         
-        int num = Random.Range(0,100);
+        int num = Random.Range(0,(rockProb + paperProb + scissorProb));
         randomText.text = "Num: " + num.ToString();
 
         //Random num falls within rock probability
@@ -276,9 +206,9 @@ public class gamemanager_v2 : MonoBehaviour {
             case Type.ROCK:
                 if (rockProb < 100)
                 {
-                    rockProb += 10f;
-                    paperProb -= 5f;
-                    scissorProb -= 5f;
+                    rockProb += 10;
+                    paperProb -= 5;
+                    scissorProb -= 5;
                     
                 }
                 break;
@@ -286,9 +216,9 @@ public class gamemanager_v2 : MonoBehaviour {
             case Type.PAPER:
                 if (paperProb < 100)
                 {
-                    paperProb += 10f;
-                    rockProb -= 5f;
-                    scissorProb -= 5f;
+                    paperProb += 10;
+                    rockProb -= 5;
+                    scissorProb -= 5;
 
                 }
                 break;
@@ -296,16 +226,16 @@ public class gamemanager_v2 : MonoBehaviour {
             case Type.SCISSORS:
                 if (scissorProb < 100)
                 {
-                    scissorProb += 10f;
-                    paperProb -= 5f;
-                    rockProb -= 5f;
+                    scissorProb += 10;
+                    paperProb -= 5;
+                    rockProb -= 5;
 
                 }
                 break;
         }
 
         ChooseWinner();
-        LastChoice = playerChoice;
+        
     }
 
     public void ChooseWinner()
@@ -395,10 +325,27 @@ public class gamemanager_v2 : MonoBehaviour {
         playerChoice = Type.SCISSORS;
     }
 
+    public void OnRockTellClick()
+    {
+        PlayerTell = Type.ROCK;
+    }
+
+    public void OnPaperTellClick()
+    {
+        PlayerTell = Type.PAPER;
+    }
+
+    public void OnScissorsTellClick()
+    {
+        
+        PlayerTell = Type.SCISSORS;
+    }
+
     public void OnStartClick()
     {
         TieText.SetActive(false);
         btnGroup.SetActive(true);
+        TellBtnGroup.SetActive(true);
         trialNum++;
         timeValue = 10;
         StartCoroutine(CountDown());
