@@ -156,6 +156,7 @@ public class gamemanager_v2 : MonoBehaviour {
                     }
                     switch (PlayerTell)
                     {
+                        //Player shows rock
                         case Type.ROCK:
                             if(rockProb <= 90)
                             {
@@ -252,11 +253,12 @@ public class gamemanager_v2 : MonoBehaviour {
         { 
             switch (AITell)
             {
-                case Type.ROCK:
+                case Type.ROCK: //Player sees that the AI is thinking about playing rock.
                     if(paperProb <= 90)
                     {
-                        paperProb += 10;
-                        scissorProb -= 10;
+                        paperProb += 10; //Probability the player will play the winning choice goes up
+                        scissorProb -= 10; //Probability the player will play the losing choice goes down
+                                           //Probability the player will play the neutral choice stays put
                     }
                     break;
                 case Type.PAPER:

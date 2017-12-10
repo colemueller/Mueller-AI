@@ -1057,7 +1057,7 @@ MonoBehaviour:
   scissorsProbText: {fileID: 1094476290}
   randomText: {fileID: 1306245886}
   DoPlayerTell: 1
-  DoIterationOverTime: 0
+  DoIterationOverTime: 1
 --- !u!224 &436847886
 RectTransform:
   m_ObjectHideFlags: 0
