@@ -6,10 +6,10 @@ using UnityEngine.UI;
 public class gamemanager_v2 : MonoBehaviour {
 
 
-    public enum Type { ROCK, PAPER, SCISSORS};
-    public Type playerChoice;
+    public enum Type { ROCK, PAPER, SCISSORS, NULL};
+    public Type playerChoice = Type.NULL;
     public Type AIChoice;
-    public Type PlayerTell;
+    public Type PlayerTell = Type.NULL;
     public Type AITell;
 
     [Range(0,100)]
@@ -32,9 +32,11 @@ public class gamemanager_v2 : MonoBehaviour {
     public Text PlayerSelectionText;
     public Text PlayerTellText;
     public Text AISelectionText;
+    public Text AISelectionTitle;
     public GameObject TieText;
     public GameObject StartButton;
     public GameObject DoneButton;
+    public GameObject PlayerTellGroup;
 
     private int PlayerWins = 0;
     private int AIWins = 0;
@@ -47,7 +49,8 @@ public class gamemanager_v2 : MonoBehaviour {
     public Text scissorsProbText;
     public Text randomText;
 
-    
+    public bool DoPlayerTell = true;
+    public bool DoIterationOverTime = false;
 
     IEnumerator CountDown()
     {
@@ -74,10 +77,22 @@ public class gamemanager_v2 : MonoBehaviour {
             MakeAIChoice();
             StartButton.SetActive(true);
             DoneButton.SetActive(false);
+            AISelectionTitle.text = "AI Selection";
 
-            
+
         }
 
+        if(DoPlayerTell == false)
+        {
+            TellBtnGroup.SetActive(false);
+            PlayerTellGroup.SetActive(false);
+        }
+        else
+        {
+            PlayerTellGroup.SetActive(true);
+        }
+
+        //change text
         switch (playerChoice)
         {
             case Type.ROCK:
@@ -92,7 +107,7 @@ public class gamemanager_v2 : MonoBehaviour {
                 PlayerSelectionText.text = "SCISSORS";
                 break;
         }
-
+        //change text
         switch (PlayerTell)
         {
             case Type.ROCK:
@@ -108,62 +123,164 @@ public class gamemanager_v2 : MonoBehaviour {
                 break;
         }
 
+        //DONT GO BELOW ZERO
+        if(rockProb < 0)
+        {
+            rockProb = 0;
+        }
+        if (paperProb < 0)
+        {
+            paperProb = 0;
+        }
+        if (scissorProb < 0)
+        {
+            scissorProb = 0;
+        }
+
     }
 
     public void MakeAIChoice()
     {
-
-        switch (PlayerTell)
+        //Change probabilities based off of player tell and AI tell -- can toggle in game
+        if (DoPlayerTell) 
         {
-            case Type.ROCK:
-                if(paperProb >= 15)
-                {
-                    scissorProb += 10;
-                    rockProb += 5;
-                    paperProb -= 15;
-                }
-                else
-                {
-                    scissorProb += paperProb / 2;
-                    rockProb += paperProb / 2;
-                    paperProb = 0;
-                }
-                break;
-            case Type.PAPER:
-                if (scissorProb >= 15)
-                {
-                    rockProb += 10;
-                    paperProb += 5;
-                    scissorProb -= 15;
-                }
-                else
-                {
-                    rockProb += scissorProb / 2;
-                    paperProb += scissorProb / 2;
-                    scissorProb = 0;
-                }
-                break;
-            case Type.SCISSORS:
-                if (rockProb >= 15)
-                {
-                    paperProb += 10;
-                    scissorProb += 5;
-                    rockProb -= 15;
-                }
-                else
-                {
-                    paperProb += rockProb / 2;
-                    scissorProb += rockProb / 2;
-                    rockProb = 0;
-                }
-                break;
+            switch (AITell)
+            {
+
+                //AI shows ROCK
+                case Type.ROCK:
+                    if (paperProb <= 90)
+                    {
+                        paperProb += 10;
+                        scissorProb -= 10;
+                    }
+                    switch (PlayerTell)
+                    {
+                        case Type.ROCK:
+                            if(rockProb <= 90)
+                            {
+                                rockProb += 10;
+                                paperProb -= 10;
+                            }
+                            break;
+                        case Type.PAPER:
+                            if (paperProb <= 90)
+                            {
+                                paperProb += 10;
+                                scissorProb -= 10;
+                            }
+                            break;
+                        case Type.SCISSORS:
+                            if (scissorProb <= 90)
+                            {
+                                scissorProb += 10;
+                                rockProb -= 10;
+                            }
+                            break;
+                    }
+                    break;
+
+                //AI shows PAPER
+                case Type.PAPER:
+                    if (scissorProb <= 90)
+                    {
+                        scissorProb += 10;
+                        rockProb -= 10;
+                    }
+                    switch (PlayerTell)
+                    {
+                        case Type.ROCK:
+                            if (rockProb <= 90)
+                            {
+                                rockProb += 10;
+                                paperProb -= 10;
+                            }
+                            break;
+                        case Type.PAPER:
+                            if (paperProb <= 90)
+                            {
+                                paperProb += 10;
+                                scissorProb -= 10;
+                            }
+                            break;
+                        case Type.SCISSORS:
+                            if (scissorProb <= 90)
+                            {
+                                scissorProb += 10;
+                                rockProb -= 10;
+                            }
+                            break;
+                    }
+                    break;
+
+                //AI shows SCISSORS
+                case Type.SCISSORS:
+                    if (rockProb <= 90)
+                    {
+                        rockProb += 10;
+                        paperProb -= 10;
+                    }
+                    switch (PlayerTell)
+                    {
+                        case Type.ROCK:
+                            if (rockProb <= 90)
+                            {
+                                rockProb += 10;
+                                paperProb -= 10;
+                            }
+                            break;
+                        case Type.PAPER:
+                            if (paperProb <= 90)
+                            {
+                                paperProb += 10;
+                                scissorProb -= 10;
+                            }
+                            break;
+                        case Type.SCISSORS:
+                            if (scissorProb <= 90)
+                            {
+                                scissorProb += 10;
+                                rockProb -= 10;
+                            }
+                            break;
+                    }
+                    break;
+            }
         }
-        
+        //Only change prob off of AI tell
+        else
+        { 
+            switch (AITell)
+            {
+                case Type.ROCK:
+                    if(paperProb <= 90)
+                    {
+                        paperProb += 10;
+                        scissorProb -= 10;
+                    }
+                    break;
+                case Type.PAPER:
+                    if (scissorProb <= 90)
+                    {
+                        scissorProb += 10;
+                        rockProb -= 10;
+                    }
+                    break;
+                case Type.SCISSORS:
+                    if (rockProb <= 90)
+                    {
+                        rockProb += 10;
+                        paperProb -= 10;
+                    }
+                    break;
+            }
+        }
+
 
         //====================================================================================================================
         //EVALUATION -- TRUE PROBABILITY -- START
         //====================================================================================================================
-        
+
         int num = Random.Range(0,(rockProb + paperProb + scissorProb));
         randomText.text = "Num: " + num.ToString();
 
@@ -200,38 +317,41 @@ public class gamemanager_v2 : MonoBehaviour {
                 break;
         }
 
-        //AT END -- learn what player picked, increase its frequency - NEW: values are all relative to each other
-        switch (playerChoice)
+        //AT END -- learn what player picked, increase its frequency - NEW: values are all relative to each other -- Can Toggle
+        if (DoIterationOverTime)
         {
-            case Type.ROCK:
-                if (rockProb < 100)
-                {
-                    rockProb += 10;
-                    paperProb -= 5;
-                    scissorProb -= 5;
-                    
-                }
-                break;
+            switch (playerChoice)
+            {
+                case Type.ROCK:
+                    if (rockProb < 100)
+                    {
+                        rockProb += 10;
+                        paperProb -= 5;
+                        scissorProb -= 5;
 
-            case Type.PAPER:
-                if (paperProb < 100)
-                {
-                    paperProb += 10;
-                    rockProb -= 5;
-                    scissorProb -= 5;
+                    }
+                    break;
 
-                }
-                break;
+                case Type.PAPER:
+                    if (paperProb < 100)
+                    {
+                        paperProb += 10;
+                        rockProb -= 5;
+                        scissorProb -= 5;
 
-            case Type.SCISSORS:
-                if (scissorProb < 100)
-                {
-                    scissorProb += 10;
-                    paperProb -= 5;
-                    rockProb -= 5;
+                    }
+                    break;
 
-                }
-                break;
+                case Type.SCISSORS:
+                    if (scissorProb < 100)
+                    {
+                        scissorProb += 10;
+                        paperProb -= 5;
+                        rockProb -= 5;
+
+                    }
+                    break;
+            }
         }
 
         ChooseWinner();
@@ -343,17 +463,34 @@ public class gamemanager_v2 : MonoBehaviour {
 
     public void OnStartClick()
     {
+        int i = Random.Range(1, 4);
+        switch (i)
+        {
+            case 1:
+                AITell = Type.ROCK;
+                AISelectionText.text = "ROCK";
+                break;
+            case 2:
+                AITell = Type.PAPER;
+                AISelectionText.text = "PAPER";
+                break;
+            case 3:
+                AITell = Type.SCISSORS;
+                AISelectionText.text = "SCISSORS";
+                break;
+        }
         TieText.SetActive(false);
         btnGroup.SetActive(true);
         TellBtnGroup.SetActive(true);
         trialNum++;
         timeValue = 10;
         StartCoroutine(CountDown());
-        AISelectionText.text = "";
+       
         StartButton.SetActive(false);
         DoneButton.SetActive(true);
         PlayerWinMessage.text = "";
         AIWinMessage.text = "";
+        AISelectionTitle.text = "AI Tell";
     }
 
     public void OnDoneClick()
@@ -374,6 +511,11 @@ public class gamemanager_v2 : MonoBehaviour {
         }
 
         tog = !tog;
+    }
+
+    public void OnPlayerTellToggle()
+    {
+        DoPlayerTell = !DoPlayerTell;
     }
 
     //================================================
